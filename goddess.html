@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Bruno Ace' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Bebas Neue' rel='stylesheet'>
+
+    <title>Goddess</title>
+    <style>
+        .meter {
+      
+      background-color: #f5f5f5;
+      border: 1px solid #ccc;
+      overflow: hidden;
+      border-radius: 10px;
+        margin-left: 46vw;
+        height: 32vw;
+        width:50px;
+        margin-top: -452px;
+        transform: rotate(180deg);
+    }
+    
+    .meter span {
+      display: block;
+      height: 100%;
+      background-image:linear-gradient(to top, #EF1523,#4BEF15);
+      transition: width 0.3s ease-in-out;
+    }
+    .mainHeading{
+    background-image: linear-gradient(to right,#08b4c4,#3c3d8c, #08b4c4  );
+    height:70px;
+    border-radius: 15px;
+    margin-top: -20px;
+    width: 100vw;
+    
+}
+#mainHead{
+    text-align: center;
+    color: white;
+    padding-top: 15px;
+    
+}
+.wholePart{
+    background-image: url(wallpaper.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    /*background-image: linear-gradient(to right,#3c3d8c, #08b4c4 ,#B7F1F6 );*/
+    height: 100vh;
+    width: 100vw;
+    margin-top: 5px;
+    border-radius: 15px;
+    padding-top: 20px;
+}
+.rightPic {
+    
+    margin-top: 2vh;
+      margin-left: 57vw;
+      border-radius: 20px;
+    }
+    
+    #treePosePic1, #treePosePic2,#treePosePic3{
+      width: 38vw;
+      height: 70vh;
+      opacity: 0;
+      position: absolute;
+      animation: fade 15s infinite;
+    }
+    
+    #treePosePic1 {
+      animation-delay: 0s;
+    }
+   
+    
+    @keyframes fade {
+      0% {
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+      }
+      33.33% {
+        opacity: 1;
+      }
+      53.33% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+   
+   
+    
+    #label-container{
+        margin-left: 47.2vw;
+        margin-top: -40px;
+        font-size:xx-large;
+        font-weight: 900;
+        
+    }
+    .camera{
+        margin-top: 27px;
+        
+    }
+    #canvas{
+        border-radius: 15px;
+        margin-left: 4vw;
+        
+    }
+    .buttonClass{
+       
+        margin-top: -30px;
+        margin-left: 85vw;
+    }
+    #nextPoseButton{
+        background-color: #ee0b86;
+        color:white;
+        height: 45px;
+        width: 90px;
+        font-size: large;
+        border-radius: 50px;
+        border: none;
+    }
+    #cameraButton{
+        margin-left: 46vw;
+        color:white;
+        background-color: #ee0b86;
+        height: 45px;
+        width: 90px;
+        font-weight: 900;
+        font-size: large;
+        border-radius: 50px;
+        border: none;
+        
+    }
+    #h{
+          text-align: left;
+          margin-left: 20px;
+          font-family: 'Bruno Ace';
+          letter-spacing: 2px;
+          color:rgb(0, 66, 249) ;
+          text-shadow: 1PX 1PX 2PX lightslategray;
+        }
+    #d{
+        margin-top: -55px;
+        margin-left: 90vw;
+        font-size: 30px;
+        letter-spacing: 2.5px;
+        font-family: 'Bebas Neue';
+    }
+    hr{
+        margin-top: -9px;
+    }
+    #headingTreePose{
+        text-align: center;
+        margin-top:30px;
+        letter-spacing: 1.3px;
+        font-family: 'Bebas Neue';
+        border: 1px solid black;
+        width: 36vw;
+        border-radius: 5px;
+        margin-left: 58vw;
+    }
+    img{
+        border: 1px solid black;
+        border-radius: 5px;
+        width: 48vw;
+        margin-left: 48vw;
+        margin-top: -15px;
+    }
+    </style>
+</head>
+<body>
+
+
+
+    <h1 id="h">YOGA SAGE</h1>
+    <h2 id="d">Day-1</h2>
+    <Hr></Hr>
+    <h1 id="headingTreePose">TREE POSE</h1>
+    <img src="goddessgif.gif" class="rightPic" id="treePosePic1">
+    
+
+            
+            <div id="label-container"></div>
+               
+            
+      
+
+            <div class="camera"><canvas id="canvas"></canvas></div>
+        <div class="meter">
+            <span id="progress"></span>
+        </div>  
+        
+           
+
+    </div>    
+            
+        
+    
+        
+            
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/pose@0.8/dist/teachablemachine-pose.min.js"></script>
+<script type="text/javascript">
+    // More API functions here:
+    // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/pose
+
+    // the link to your model provided by Teachable Machine export panel
+    const URL = "./my-pose-model(goddess)/";
+    let model, webcam, ctx, labelContainer, maxPredictions,countCorrect=0,countWrong=0;
+    
+    async function init() {
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+        
+        // load the model and metadata
+        // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+        // Note: the pose library adds a tmPose object to your window (window.tmPose)
+        model = await tmPose.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+
+        // Convenience function to setup a webcam
+        const size = 450;
+        const flip = true; // whether to flip the webcam
+        webcam = new tmPose.Webcam(size, size, flip); // width, height, flip
+        await webcam.setup(); // request access to the webcam
+        await webcam.play();
+        window.requestAnimationFrame(loop);
+
+        // append/get elements to the DOM
+        const canvas = document.getElementById("canvas");
+        canvas.width = size; canvas.height = size;
+        ctx = canvas.getContext("2d");
+        labelContainer = document.getElementById("label-container");
+        for (let i = 0; i < maxPredictions; i++) { // and class labels
+            labelContainer.appendChild(document.createElement("div"));
+        }
+    }
+
+    async function loop(timestamp) {
+        webcam.update(); // update the webcam frame
+        await predict();
+        window.requestAnimationFrame(loop);
+    }
+
+    async function predict() {
+        // Prediction #1: run input through posenet
+        // estimatePose can take in an image, video or canvas html element
+        const { pose, posenetOutput } = await model.estimatePose(webcam.canvas);
+        // Prediction 2: run input through teachable machine classification model
+        const prediction = await model.predict(posenetOutput);
+
+        for (let i = 0; i < maxPredictions; i++) {
+            const classPrediction =(prediction[0].probability.toFixed(3))*100+"%";
+                labelContainer.childNodes[0].innerHTML = classPrediction;
+        }
+        countAccuracy(prediction[0].probability.toFixed(3)*100);
+            
+        updateAccuracyMeter(prediction[0].probability.toFixed(3)*100);
+
+        // finally draw the poses
+        drawPose(pose);
+        await new Promise(resolve => setTimeout(resolve, 200));
+    }
+
+    function updateAccuracyMeter(accuracy) {
+      var progressElement = document.getElementById('progress');
+      progressElement.style.height = accuracy + '%';
+    }
+
+    function redirectToPage() {
+                
+                window.location.href = "http://127.0.0.1:5500/downDog.html"; // Replace with the desired URL
+              }
+
+    function drawPose(pose) {
+        if (webcam.canvas) {
+            ctx.drawImage(webcam.canvas, 0, 0);
+            // draw the keypoints and skeleton
+            if (pose) {
+                const minPartConfidence = 0.5;
+                tmPose.drawKeypoints(pose.keypoints, minPartConfidence, ctx);
+                tmPose.drawSkeleton(pose.keypoints, minPartConfidence, ctx);
+            }
+        }
+    }
+    
+    
+    init();
+    function countAccuracy(accuracy){
+        if(accuracy>85)
+            countCorrect++;
+        else
+            countWrong++;
+
+        console.log(countCorrect);
+            speakText(countCorrect);
+        if(countCorrect>100)
+                redirectToPage();
+    }
+
+    function speakText(countCorrect,){
+                 if ('speechSynthesis' in window) {
+  // Speech synthesis API supported
+
+  var initialSpeech = new SpeechSynthesisUtterance();
+  initialSpeech.text = 'Goddess Pose. This pose opens the hips and chest while strengthening and toning the lower body. Goddess pose stimulates the uro-genital, respiratory and cardiovascular systems.';
+  initialSpeech.volume = 1; // 0 to 1
+  initialSpeech.rate = 1; // 0.1 to 10
+  initialSpeech.pitch = 0; // 0 to 2
+
+  var correctSpeech = new SpeechSynthesisUtterance();
+  correctSpeech.text = 'hello,akash you are doing great. Hold on the pose for few more seconds.';
+  correctSpeech.volume = 1; // 0 to 1
+  correctSpeech.rate = 1; // 0.1 to 10
+  correctSpeech.pitch = 0; // 0 to 2
+  
+
+
+  //doing wrong                  
+  var wrongSpeech = new SpeechSynthesisUtterance();
+  wrongSpeech.text = 'hello,akash you are doing it wrong. You need to practice more.';
+  wrongSpeech.volume = 1; // 0 to 1
+  wrongSpeech.rate = 1; // 0.1 to 10
+  wrongSpeech.pitch = 0;
+
+
+  var nextSpeech = new SpeechSynthesisUtterance();
+  nextSpeech.text = 'Well done. Moving you to the next pose.';
+  nextSpeech.volume = 1; // 0 to 1
+  nextSpeech.rate = 1; // 0.1 to 10
+  nextSpeech.pitch = 0;
+
+  // Set the voice
+  var voices = speechSynthesis.getVoices();
+  correctSpeech.voice = voices[0]; 
+  wrongSpeech.voice = voices[0]; // Set the first voice in the list
+  nextSpeech.voice = voices[0];
+  initialSpeech.voice = voices[0]; 
+  // Speak the text
+  if(countCorrect==-1)
+  {
+    
+    speechSynthesis.speak(initialSpeech);
+    setTimeout(function() {
+            }, 5000);
+   
+  } 
+  if(countCorrect==25)
+  {
+    
+    speechSynthesis.speak(correctSpeech);
+   
+  } 
+  else  if(countCorrect==70)
+    {    speechSynthesis.speak(nextSpeech);
+            setTimeout(function() {
+                redirectToPage();
+            }, 5000);
+         
+    }
+  if(countWrong>50) {
+    speechSynthesis.speak(wrongSpeech);
+    countWrong=0;
+}
+  
+} 
+
+}
+</script>
+
+</body>
+</html>
